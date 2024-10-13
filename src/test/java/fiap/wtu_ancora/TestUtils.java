@@ -25,13 +25,12 @@ public class TestUtils {
         return event;
     }
 
-    public static Unit createUnitFake() {
-        Unit unit = new Unit();
-        unit.setId(1L);
-        unit.setEndereco("Fake endereco");
-        unit.setFranchised(true);
-        unit.setName("Fake name");
-        return unit;
+    public static UnitDTO createUnitDTOFake() {
+        UnitDTO unitDTO = new UnitDTO();
+        unitDTO.setEndereco("Fake endereco");
+        unitDTO.setFranchised(true);
+        unitDTO.setName("Fake name");
+        return unitDTO;
     }
 
     public static User createUserFake() {
