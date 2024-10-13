@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 @Service
 public class EventService {
 
-    EventRepository eventRepository;
-    UnitService unitService;
-    UserService userService;
+    private final EventRepository eventRepository;
+    private final UnitService unitService;
+    private final UserService userService;
 
 
     public EventService(EventRepository eventRepository, UnitService unitService, UserService userService) {

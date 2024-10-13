@@ -13,11 +13,13 @@ import java.util.Set;
 @Service
 public class UnitService {
 
-    UnitRepository unitRepository;
+    private final UnitRepository unitRepository;
 
     public UnitService(UnitRepository unitRepository) {
         this.unitRepository = unitRepository;
     }
+
+    public Optional<Unit> findUnitById(Long id) {return unitRepository.findById(id);}
 
     public ResponseEntity<?> getAllUnits() {
         return ResponseEntity.ok(unitRepository.findAll());

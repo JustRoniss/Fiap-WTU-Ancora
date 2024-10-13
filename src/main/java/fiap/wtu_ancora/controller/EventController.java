@@ -2,7 +2,6 @@ package fiap.wtu_ancora.controller;
 
 import fiap.wtu_ancora.dto.EventDTO;
 import fiap.wtu_ancora.service.EventService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,8 +10,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/events")
 public class EventController {
 
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
+
+    public EventController(EventService eventService) {
+        this.eventService = eventService;
+    }
 
     @GetMapping("/get-all")
     public ResponseEntity<?>getAllEvents() {
