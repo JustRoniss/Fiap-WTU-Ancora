@@ -1,54 +1,37 @@
 package fiap.wtu_ancora.controller;
 
-import fiap.wtu_ancora.model.Unit;
-import fiap.wtu_ancora.repository.UnitRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import fiap.wtu_ancora.dto.UnitDTO;
+import fiap.wtu_ancora.service.UnitService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/units")
 public class UnitController {
 
-    @Autowired
-    private UnitRepository unitRepository;
+    UnitService unitService;
+
+    public UnitController(UnitService unitService) {
+        this.unitService = unitService;
+    }
 
     @GetMapping("/get-all")
-    public List<Unit> getAllUnits() {
-        return unitRepository.findAll();
+    public ResponseEntity<?> getAllUnits() {
+        return unitService.getAllUnits();
     }
 
     @PostMapping("/create")
-    public Unit createUnit(@RequestBody Unit unit) {
-        return unitRepository.save(unit);
+    public ResponseEntity<?> createUnit(@RequestBody UnitDTO unitDTO) {
+        return unitService.createUnit(unitDTO);
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<Unit> editUnit(@PathVariable Long id, @RequestBody Unit unitDatails) {
-        Optional<Unit> unitOptional = unitRepository.findById(id);
-        if(unitOptional.isPresent()){
-            Unit unit = unitOptional.get();
-            unit.setName(unitDatails.getName());
-            unit.setEndereco(unitDatails.getEndereco());
-            unit.setFranchised(unitDatails.isFranchised());
-            final Unit updatedUnit = unitRepository.save(unit);
-            return ResponseEntity.ok(updatedUnit);
-        }else{
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<?> editUnit(@PathVariable Long id, @RequestBody UnitDTO unitDTO) {
+        return unitService.updateUnit(id, unitDTO);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<HttpStatus> deleteUnit(@PathVariable Long id) {
-        try{
-            unitRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<?> deleteUnit(@PathVariable Long id) {
+        return unitService.deleteUnit(id);
     }
 }

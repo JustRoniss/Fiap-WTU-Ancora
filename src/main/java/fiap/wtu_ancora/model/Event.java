@@ -30,7 +30,6 @@ public class Event {
     @Column(columnDefinition = "LONGTEXT")
     private String iframe;
 
-
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(
             name = "eventos_unidades",
