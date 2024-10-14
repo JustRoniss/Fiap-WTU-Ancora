@@ -52,15 +52,15 @@ public class AuthenticationService {
 
     public ResponseEntity<?> register (RegisterDTO registerDTO) {
 
+        Optional<Unit> unit = unitService.findUnitById(registerDTO.unitId());
+
         if(this.userService.findByEmail(registerDTO.email()) != null) {
             return ResponseEntity.badRequest().body("Email already exists");
         }
-        if(unitService.findUnitById(registerDTO.unitId()).isEmpty()) {
+        if(unit.isEmpty()) {
             return ResponseEntity.badRequest().body("Unit does not exist");
         }
-
-        Optional<Unit> unit = unitService.findUnitById(registerDTO.unitId());
-
+        
         String encryptedPassword = encryptPassword(registerDTO.password());
         User user = new User(registerDTO.name(), registerDTO.email(), encryptedPassword, UserRole.USER);
 
