@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -64,6 +65,10 @@ public class EventService {
         }catch (Exception e){
             return new ResponseEntity<>("Error to delete this event", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public List<Event> findEventsByUserEmail(String email) {
+        return eventRepository.findEventsByUserEmail(email);
     }
 
     private Event mapEventDTOToEvent(EventDTO eventDTO, Event event) {

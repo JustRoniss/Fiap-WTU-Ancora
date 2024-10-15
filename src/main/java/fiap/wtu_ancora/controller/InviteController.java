@@ -1,7 +1,7 @@
 package fiap.wtu_ancora.controller;
 
-import fiap.wtu_ancora.model.Event;
-import fiap.wtu_ancora.repository.EventRepository;
+import fiap.wtu_ancora.model.Invite;
+import fiap.wtu_ancora.service.InviteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,15 +20,15 @@ import java.util.List;
 
 public class InviteController {
 
-    private EventRepository eventRepository;
+    private InviteService inviteService;
 
-    public InviteController(EventRepository eventRepository){
-        this.eventRepository = eventRepository;
+    public InviteController(InviteService inviteService){
+
+        this.inviteService = inviteService;
     }
 
     @GetMapping("/get-invites/{email}")
-    public ResponseEntity<List<Event>> getEventsForUser(@PathVariable String email) {
-        List<Event> events = eventRepository.findEventsByUserEmail(email);
-        return ResponseEntity.ok(events);
+    public ResponseEntity<?> getEventsForUser(@PathVariable String email) {
+        return inviteService.getUserInvites(email);
     }
 }
