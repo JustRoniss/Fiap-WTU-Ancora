@@ -25,6 +25,10 @@ public class Event {
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
 
+    private boolean isPublic;
+
+    private String publicLink;
+
     @Transient
     private Long unitId;
 
@@ -88,6 +92,22 @@ public class Event {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
+    }
+
+    public String getPublicLink() {
+        return publicLink;
+    }
+
+    public void setPublicLink(String publicLink) {
+        this.publicLink = publicLink;
     }
 
     public Long getUnitId() {

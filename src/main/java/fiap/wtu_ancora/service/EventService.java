@@ -21,20 +21,27 @@ import java.util.stream.Collectors;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final EventHashService eventHashService;
     private final UnitService unitService;
     private final UserService userService;
 
 
-    public EventService(EventRepository eventRepository, UnitService unitService, UserService userService) {
+    public EventService(EventRepository eventRepository, EventHashService eventHashService ,UnitService unitService, UserService userService) {
         this.eventRepository = eventRepository;
         this.unitService = unitService;
         this.userService = userService;
+        this.eventHashService = eventHashService;
     }
 
     public ResponseEntity<?> createEvent(EventDTO eventDTO) {
         try{
             Event event = new Event();
+
+            String publickLink = eventDTO.isPublic() ? eventHashService.createSignedHash(eventDTO) : null;
+            eventDTO.setPublicLink(publickLink);
+
             mapEventDTOToEvent(eventDTO, event);
+
             eventRepository.save(event);
             return ResponseEntity.ok("Successfully created a new event");
         } catch (Exception e){
@@ -94,7 +101,8 @@ public class EventService {
         event.setUnits(units);
         event.setUsers(users);
         event.setIframe(eventDTO.getIframe());
-
+        event.setPublic(eventDTO.isPublic());
+        event.setPublicLink(eventDTO.getPublicLink());
         return event;
     }
 }
