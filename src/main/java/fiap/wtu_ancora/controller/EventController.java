@@ -35,4 +35,14 @@ public class EventController {
     public ResponseEntity<?> deleteEvent(@PathVariable Long id){
         return eventService.deleteEvent(id);
     }
+
+    @GetMapping("/public/{publicHash}")
+    public ResponseEntity<?> getEventByPublicHash(@PathVariable String publicHash) {
+         return eventService.findEventByPublicHash(publicHash);
+    }
+
+    @GetMapping("/public/{eventId}/create-public-link")
+    public ResponseEntity<?> createPublicLink(@PathVariable Long eventId) {
+        return eventService.createPublicLink(eventId);
+    }
 }

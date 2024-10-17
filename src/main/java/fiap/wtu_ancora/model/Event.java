@@ -14,12 +14,20 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
+
     private String description;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date startDate;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
+
+    private boolean isPublic;
+
+    private String publicLink;
 
     @Transient
     private Long unitId;
@@ -84,6 +92,22 @@ public class Event {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
+    }
+
+    public String getPublicLink() {
+        return publicLink;
+    }
+
+    public void setPublicLink(String publicLink) {
+        this.publicLink = publicLink;
     }
 
     public Long getUnitId() {

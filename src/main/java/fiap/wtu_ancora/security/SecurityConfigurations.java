@@ -32,9 +32,10 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.GET, "/users/get-all").hasRole("ADMIN")
                         .requestMatchers("/invites/**").hasRole("USER")
 
-                        .requestMatchers("units/get-all").permitAll()
-                        .requestMatchers("units/**").hasRole("ADMIN")
-                        .requestMatchers("events/**").hasRole("ADMIN")
+                        .requestMatchers("/units/get-all").permitAll()
+                        .requestMatchers("/units/**").hasRole("ADMIN")
+                        .requestMatchers("/events/public/**").permitAll()
+                        .requestMatchers("/events/**").hasRole("ADMIN")
                         .requestMatchers("/home/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )

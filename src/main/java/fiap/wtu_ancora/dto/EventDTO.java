@@ -1,5 +1,7 @@
 package fiap.wtu_ancora.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Date;
 import java.util.Set;
 
@@ -10,6 +12,11 @@ public class EventDTO {
     private Date startDate;
     private Date endDate;
     private String iframe;
+
+    @JsonProperty("isPublic")
+    private boolean isPublic;
+
+    private String publicLink;
     private Set<UnitDTO> units;
     private Set<UserDTO> users;
 
@@ -71,5 +78,21 @@ public class EventDTO {
 
     public void setIframe(String iframe) {
         this.iframe = iframe;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
+    }
+
+    public String getPublicLink() {
+        return publicLink;
+    }
+
+    public void setPublicLink(String publicLink) {
+        this.publicLink = publicLink;
     }
 }
