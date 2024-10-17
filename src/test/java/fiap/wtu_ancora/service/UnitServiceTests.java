@@ -2,7 +2,7 @@ package fiap.wtu_ancora.service;
 
 import fiap.wtu_ancora.TestUtils;
 import fiap.wtu_ancora.dto.UnitDTO;
-import fiap.wtu_ancora.model.Unit;
+import fiap.wtu_ancora.domain.Unit;
 import fiap.wtu_ancora.repository.UnitRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

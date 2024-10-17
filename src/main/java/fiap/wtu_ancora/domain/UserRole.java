@@ -1,4 +1,4 @@
-package fiap.wtu_ancora.model;
+package fiap.wtu_ancora.domain;
 
 public enum UserRole {
     ADMIN("admin"),

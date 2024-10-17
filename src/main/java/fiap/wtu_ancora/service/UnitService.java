@@ -1,7 +1,7 @@
 package fiap.wtu_ancora.service;
 
 import fiap.wtu_ancora.dto.UnitDTO;
-import fiap.wtu_ancora.model.Unit;
+import fiap.wtu_ancora.domain.Unit;
 import fiap.wtu_ancora.repository.UnitRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

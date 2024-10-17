@@ -1,7 +1,7 @@
 package fiap.wtu_ancora.service;
 
-import fiap.wtu_ancora.model.Event;
-import fiap.wtu_ancora.model.Invite;
+import fiap.wtu_ancora.domain.Event;
+import fiap.wtu_ancora.domain.Invite;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

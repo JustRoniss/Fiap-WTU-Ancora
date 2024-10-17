@@ -1,6 +1,6 @@
 package fiap.wtu_ancora.repository;
 
-import fiap.wtu_ancora.model.User;
+import fiap.wtu_ancora.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.security.core.userdetails.UserDetails;

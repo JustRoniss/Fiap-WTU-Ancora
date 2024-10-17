@@ -3,17 +3,17 @@ package fiap.wtu_ancora.service;
 import fiap.wtu_ancora.dto.EventDTO;
 import fiap.wtu_ancora.dto.UnitDTO;
 import fiap.wtu_ancora.dto.UserDTO;
-import fiap.wtu_ancora.model.Event;
-import fiap.wtu_ancora.model.Unit;
-import fiap.wtu_ancora.model.User;
+import fiap.wtu_ancora.domain.Event;
+import fiap.wtu_ancora.domain.Unit;
+import fiap.wtu_ancora.domain.User;
+import fiap.wtu_ancora.model.ApiReponse;
 import fiap.wtu_ancora.repository.EventRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -33,7 +33,7 @@ public class EventService {
         this.eventHashService = eventHashService;
     }
 
-    public ResponseEntity<?> createEvent(EventDTO eventDTO) {
+    public ResponseEntity<ApiReponse<Long>> createEvent(EventDTO eventDTO) {
         try{
             Event event = new Event();
 
@@ -43,34 +43,118 @@ public class EventService {
             mapEventDTOToEvent(eventDTO, event);
 
             eventRepository.save(event);
-            return ResponseEntity.ok(event.getId());
+
+            Map<String, String> links = new HashMap<>();
+            links.put("self", "/events/create");
+            links.put("edit",  "/events/edit/" + eventDTO.getId());
+            links.put("delete",  "/events/delete/" + eventDTO.getId());
+
+            ApiReponse<Long> response = new ApiReponse<>(
+                    "Evento criado com sucesso",
+                    HttpStatus.OK.value(),
+                    links,
+                    LocalDateTime.now(),
+                    event.getId()
+            );
+            return ResponseEntity.ok(response);
+
         } catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            ApiReponse<Long> errorResponse = new ApiReponse<>(
+                e.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                null,
+                LocalDateTime.now(),
+                null
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public ResponseEntity<?> getAllEvents() {
-        return ResponseEntity.ok(eventRepository.findAll());
+    public ResponseEntity<ApiReponse<List<Event>>> getAllEvents() {
+        try{
+            List<Event> events = eventRepository.findAll();
+
+            ApiReponse<List<Event>> response = new ApiReponse<>(
+                "Eventos retornados com sucesso",
+                HttpStatus.OK.value(),
+                null,
+                LocalDateTime.now(),
+                events
+            );
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e){
+            ApiReponse<List<Event>> errorResponse = new ApiReponse<>(
+                e.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                null,
+                LocalDateTime.now(),
+                null
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    public ResponseEntity<?> updateEvent(Long id, EventDTO eventDTO) {
+    public ResponseEntity<ApiReponse<Event>> updateEvent(Long id, EventDTO eventDTO) {
+
+        Map<String, String> links = new HashMap<>();
+        links.put("self", "/events/edit/" + eventDTO.getId());
+        links.put("delete",  "/events/delete/" + eventDTO.getId());
+
         Optional<Event> eventOptional = eventRepository.findById(id);
         if (eventOptional.isPresent()) {
             Event event = eventOptional.get();
             mapEventDTOToEvent(eventDTO, event);
             eventRepository.save(event);
-            return ResponseEntity.ok("Successfully updated the event");
+
+            ApiReponse<Event> response = new ApiReponse<>(
+                "Evento atualizado com sucesso",
+                    HttpStatus.OK.value(),
+                    links,
+                    LocalDateTime.now(),
+                    event
+            );
+            return ResponseEntity.ok(response);
         } else {
-            return new ResponseEntity<>("Event not found", HttpStatus.NOT_FOUND);
+            ApiReponse<Event> errorResponse = new ApiReponse<>(
+                    "Evento com o ID: " + eventDTO.getId() + " não encontrado",
+                    HttpStatus.NOT_FOUND.value(),
+                    null,
+                    LocalDateTime.now(),
+                    null
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
     }
 
-    public ResponseEntity<?> deleteEvent(Long id) {
+    public ResponseEntity<ApiReponse<Long>> deleteEvent(Long id) {
+
+        Map<String, String> links = new HashMap<>();
+        links.put("self", "/events/delete/" + id);
+        links.put("edit",  "/events/edit/" + id);
+        links.put("create",  "/events/create/");
+
         try{
             eventRepository.deleteById(id);
-            return ResponseEntity.ok("Event deleted successfully");
+
+            ApiReponse<Long> response = new ApiReponse<>(
+                    "Evento de ID: " + id + " deletado com sucesso",
+                    HttpStatus.OK.value(),
+                    links,
+                    LocalDateTime.now(),
+                    id
+            );
+
+            return ResponseEntity.ok(response);
         }catch (Exception e){
-            return new ResponseEntity<>("Error to delete this event", HttpStatus.INTERNAL_SERVER_ERROR);
+            ApiReponse<Long> errorResponse = new ApiReponse<>(
+                    "Evento de ID: " + id + " não foi deletado",
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    links,
+                    LocalDateTime.now(),
+                    id
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

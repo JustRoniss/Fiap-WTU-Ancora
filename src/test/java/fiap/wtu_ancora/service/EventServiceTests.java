@@ -2,9 +2,10 @@ package fiap.wtu_ancora.service;
 
 import fiap.wtu_ancora.TestUtils;
 import fiap.wtu_ancora.dto.EventDTO;
-import fiap.wtu_ancora.model.Event;
-import fiap.wtu_ancora.model.Unit;
-import fiap.wtu_ancora.model.User;
+import fiap.wtu_ancora.domain.Event;
+import fiap.wtu_ancora.domain.Unit;
+import fiap.wtu_ancora.domain.User;
+import fiap.wtu_ancora.model.ApiReponse;
 import fiap.wtu_ancora.repository.EventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,19 +45,27 @@ public class EventServiceTests {
     @Test
     public void testCreateEventWithSuccess(){
         EventDTO eventDTO = TestUtils.createEventDTOFake();
-        Event event = new Event();
+        eventDTO.setId(10L);
 
         Set<Unit> units = new HashSet<>();
         Set<User> users = new HashSet<>();
 
         Mockito.when(unitService.findUnitsByIds(anySet())).thenReturn(units);
         Mockito.when(userService.findByEmails(anySet())).thenReturn(users);
-        Mockito.when(eventRepository.save(any(Event.class))).thenReturn(event);
 
-        ResponseEntity<?> response = eventService.createEvent(eventDTO);
+        Mockito.when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
+            Event savedEvent = invocation.getArgument(0);
+            savedEvent.setId(10L);
+            return savedEvent;
+        });
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Successfully created a new event", response.getBody());
+        ResponseEntity<ApiReponse<Long>> response = eventService.createEvent(eventDTO);
+        ApiReponse<Long> apiReponse = response.getBody();
+
+        assertNotNull(apiReponse);
+        assertEquals(10L, apiReponse.getData());
+        assertEquals("Evento criado com sucesso", apiReponse.getMessage());
+
         Mockito.verify(eventRepository, Mockito.times(1)).save(any(Event.class));
     }
 
@@ -65,10 +74,12 @@ public class EventServiceTests {
         EventDTO eventDTO = TestUtils.createEventDTOFake();
         Mockito.when(unitService.findUnitsByIds(anySet())).thenThrow(new RuntimeException("Error"));
 
-        ResponseEntity<?> response = eventService.createEvent(eventDTO);
+        ResponseEntity<ApiReponse<Long>> response = eventService.createEvent(eventDTO);
+        ApiReponse<Long> apiReponse = response.getBody();
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Error", response.getBody());
+        assertEquals("Error", apiReponse.getMessage());
+
         Mockito.verify(eventRepository, Mockito.never()).save(any(Event.class));
     }
 
@@ -85,10 +96,13 @@ public class EventServiceTests {
         Mockito.when(userService.findByEmails(anySet())).thenReturn(users);
         Mockito.when(eventRepository.save(any(Event.class))).thenReturn(event);
 
-        ResponseEntity<?> response = eventService.updateEvent(eventId, eventDTO);
+        ResponseEntity<ApiReponse<Event>> response = eventService.updateEvent(eventId, eventDTO);
+        ApiReponse<Event> apiReponse = response.getBody();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Successfully updated the event", response.getBody());
+        assertEquals("Evento atualizado com sucesso", apiReponse.getMessage());
+        assertEquals(event, apiReponse.getData());
+
         Mockito.verify(eventRepository, Mockito.times(1)).save(event);
     }
 
@@ -99,10 +113,12 @@ public class EventServiceTests {
 
         Mockito.when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
 
-        ResponseEntity<?> response = eventService.updateEvent(eventId, eventDTO);
+        ResponseEntity<ApiReponse<Event>> response = eventService.updateEvent(eventId, eventDTO);
+        ApiReponse<Event> apiReponse = response.getBody();
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Event not found", response.getBody());
+        assertEquals("Evento com o ID: " + eventDTO.getId() + " não encontrado", apiReponse.getMessage());
+
         Mockito.verify(eventRepository, Mockito.never()).save(any(Event.class));
     }
 
@@ -112,10 +128,13 @@ public class EventServiceTests {
 
         Mockito.doNothing().when(eventRepository).deleteById(eventId);
 
-        ResponseEntity<?> response = eventService.deleteEvent(eventId);
+        ResponseEntity<ApiReponse<Long>> response = eventService.deleteEvent(eventId);
+        ApiReponse<Long> apiReponse = response.getBody();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Event deleted successfully", response.getBody());
+        assertEquals("Evento de ID: " + eventId + " deletado com sucesso", apiReponse.getMessage());
+        assertEquals(eventId, apiReponse.getData());
+
         Mockito.verify(eventRepository, Mockito.times(1)).deleteById(eventId);
     }
 
@@ -125,10 +144,12 @@ public class EventServiceTests {
 
         Mockito.doThrow(new RuntimeException("Delete error")).when(eventRepository).deleteById(eventId);
 
-        ResponseEntity<?> response = eventService.deleteEvent(eventId);
+        ResponseEntity<ApiReponse<Long>> response = eventService.deleteEvent(eventId);
+        ApiReponse<Long> apiReponse = response.getBody();
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Error to delete this event", response.getBody());
+        assertEquals("Evento de ID: " + eventId + " não foi deletado", apiReponse.getMessage());
+
         Mockito.verify(eventRepository, Mockito.times(1)).deleteById(eventId);
     }
 
