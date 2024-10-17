@@ -24,17 +24,15 @@ public class EventHashService {
 
             byte[] hashBytes = sha256_HMAC.doFinal(dataToHash.getBytes(StandardCharsets.UTF_8));
 
-            return Base64.getEncoder().encodeToString(hashBytes);
+            return Base64.getUrlEncoder().encodeToString(hashBytes);
 
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException("Erro ao gerar hash assinado: " + e.getMessage(), e);
         }
-
     }
 
     public boolean validateSignedHash(EventDTO eventDTO, String signedHash) {
         String expectedHash = createSignedHash(eventDTO);
-
         return expectedHash.equals(signedHash);
     }
 }

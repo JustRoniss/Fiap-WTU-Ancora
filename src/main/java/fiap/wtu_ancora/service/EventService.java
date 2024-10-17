@@ -43,7 +43,7 @@ public class EventService {
             mapEventDTOToEvent(eventDTO, event);
 
             eventRepository.save(event);
-            return ResponseEntity.ok("Successfully created a new event");
+            return ResponseEntity.ok(event.getId());
         } catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -76,6 +76,26 @@ public class EventService {
 
     public List<Event> findEventsByUserEmail(String email) {
         return eventRepository.findEventsByUserEmail(email);
+    }
+
+    public ResponseEntity<?> findEventByPublicHash(String publicHash) {
+         Optional<Event> event =  eventRepository.findByPublicLink(publicHash);
+        if (event.isPresent()) {
+            return ResponseEntity.ok(event.get().getIframe());
+        } else {
+            return new ResponseEntity<>("Event not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    public ResponseEntity<?> createPublicLink(Long eventId) {
+        Optional<Event> eventOptional = eventRepository.findById(eventId);
+        if (eventOptional.isPresent()) {
+            Event event = eventOptional.get();
+            String link = event.getPublicLink();
+            return ResponseEntity.ok("http:localhost:3000/events/public/"+link);
+        }else {
+            return new ResponseEntity<>("Event not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     private Event mapEventDTOToEvent(EventDTO eventDTO, Event event) {
