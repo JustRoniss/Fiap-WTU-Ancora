@@ -2,10 +2,12 @@ package fiap.wtu_ancora.service;
 
 import fiap.wtu_ancora.domain.Event;
 import fiap.wtu_ancora.domain.Invite;
+import fiap.wtu_ancora.model.ApiReponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +20,7 @@ public class InviteService {
         this.eventService = eventService;
     }
 
-    public ResponseEntity<?> getUserInvites(String userEmail){
+    public ResponseEntity<ApiReponse<List<Invite>>> getUserInvites(String userEmail){
        try{
            List<Event> events = eventService.findEventsByUserEmail(userEmail);
            List<Invite> invites = new ArrayList<>();
@@ -33,9 +35,25 @@ public class InviteService {
                invites.add(invite);
 
            }
-           return ResponseEntity.ok(invites);
+
+           ApiReponse<List<Invite>> reponse = new ApiReponse<>(
+                   "Convites encontrados para o e-mail: " + userEmail,
+                   HttpStatus.OK.value(),
+                   null,
+                   LocalDateTime.now(),
+                   invites
+           );
+
+           return ResponseEntity.ok(reponse);
        } catch (Exception e) {
-           return new ResponseEntity<>("Error on invite service", HttpStatus.INTERNAL_SERVER_ERROR);
+           ApiReponse<List<Invite>> errorReponse = new ApiReponse<>(
+                   "Ocorreu um erro ao buscar convites para o e-mail: " + userEmail,
+                   HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                   null,
+                   LocalDateTime.now(),
+                   null
+           );
+           return new ResponseEntity<>(errorReponse, HttpStatus.INTERNAL_SERVER_ERROR);
        }
 
     }

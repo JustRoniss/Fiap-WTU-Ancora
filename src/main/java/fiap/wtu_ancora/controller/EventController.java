@@ -21,6 +21,7 @@ public class EventController {
     }
 
     // Esse endpoint por conta do relacionamento entre as entidades do dominio, devolve tudo, inclusive informacoes que nao sao pertinetes a eventos.
+    // Para filtrar isso, foi criado o endpoint /get-invites/{email} que devolve um Invite, que contém apenas as informacoes necessarias.
     @GetMapping("/get-all")
     public ResponseEntity<ApiReponse<List<Event>>>getAllEvents() {
         return eventService.getAllEvents();
