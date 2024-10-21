@@ -3,6 +3,7 @@ package fiap.wtu_ancora.service;
 import fiap.wtu_ancora.TestUtils;
 import fiap.wtu_ancora.dto.UnitDTO;
 import fiap.wtu_ancora.domain.Unit;
+import fiap.wtu_ancora.model.ApiReponse;
 import fiap.wtu_ancora.repository.UnitRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,10 +37,12 @@ public class UnitServiceTests {
 
         Mockito.when(unitRepository.save(Mockito.any(Unit.class))).thenReturn(unit);
 
-        ResponseEntity<?> response = unitService.createUnit(unitDTO);
+        ResponseEntity<ApiReponse<String>> response = unitService.createUnit(unitDTO);
+        ApiReponse<String> apiReponse = response.getBody();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Successfully created a new unit", response.getBody());
+        assert apiReponse != null;
+        assertEquals("Unidade criada com sucesso", apiReponse.getMessage());
         Mockito.verify(unitRepository, Mockito.times(1)).save(Mockito.any(Unit.class));
     }
 
@@ -48,10 +51,13 @@ public class UnitServiceTests {
         UnitDTO unitDTO = TestUtils.createUnitDTOFake();
         Mockito.when(unitRepository.save(Mockito.any(Unit.class))).thenThrow(new RuntimeException("Error"));
 
-        ResponseEntity<?> response = unitService.createUnit(unitDTO);
+        ResponseEntity<ApiReponse<String>> response = unitService.createUnit(unitDTO);
+        ApiReponse<String> apiReponse = response.getBody();
+
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Error", response.getBody());
+        assert apiReponse != null;
+        assertEquals("Erro ao criar unidade", apiReponse.getMessage());
         Mockito.verify(unitRepository, Mockito.times(1)).save(Mockito.any(Unit.class));
     }
 
@@ -66,10 +72,12 @@ public class UnitServiceTests {
         Mockito.when(unitRepository.findById(unitId)).thenReturn(Optional.of(unit));
         Mockito.when(unitRepository.save(Mockito.any(Unit.class))).thenReturn(unit);
 
-        ResponseEntity<?> response = unitService.updateUnit(unitId, unitDTO);
+        ResponseEntity<ApiReponse<String>> response = unitService.updateUnit(unitId, unitDTO);
+        ApiReponse<String> apiReponse = response.getBody();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Successfully updated a unit", response.getBody());
+        assert apiReponse != null;
+        assertEquals("Unidade atualizada com sucesso", apiReponse.getMessage());
         Mockito.verify(unitRepository, Mockito.times(1)).save(Mockito.any(Unit.class));
     }
 
@@ -80,10 +88,12 @@ public class UnitServiceTests {
 
         Mockito.when(unitRepository.findById(unitId)).thenReturn(Optional.empty());
 
-        ResponseEntity<?> response = unitService.updateUnit(unitId, unitDTO);
+        ResponseEntity<ApiReponse<String>> response = unitService.updateUnit(unitId, unitDTO);
+        ApiReponse<String> apiReponse = response.getBody();
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Unit not found", response.getBody());
+        assert apiReponse != null;
+        assertEquals("Unidade não encontrada", apiReponse.getMessage());
         Mockito.verify(unitRepository, Mockito.never()).save(Mockito.any(Unit.class));
     }
 
@@ -93,10 +103,12 @@ public class UnitServiceTests {
 
         Mockito.doNothing().when(unitRepository).deleteById(unitId);
 
-        ResponseEntity<?> response = unitService.deleteUnit(unitId);
+        ResponseEntity<ApiReponse<String>> response = unitService.deleteUnit(unitId);
+        ApiReponse<String> apiReponse = response.getBody();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Successfully deleted a unit", response.getBody());
+        assert apiReponse != null;
+        assertEquals("Unidade excluida de Id: " + unitId + " excluida com sucesso", apiReponse.getMessage());
         Mockito.verify(unitRepository, Mockito.times(1)).deleteById(unitId);
     }
 
@@ -106,13 +118,14 @@ public class UnitServiceTests {
 
         Mockito.doThrow(new RuntimeException("Delete error")).when(unitRepository).deleteById(unitId);
 
-        ResponseEntity<?> response = unitService.deleteUnit(unitId);
+        ResponseEntity<ApiReponse<String>> response = unitService.deleteUnit(unitId);
+        ApiReponse<String> apiReponse = response.getBody();
+
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Error to delete this unit", response.getBody());
+        assert apiReponse != null;
+        assertEquals("Erro ao excluir unidade de Id: " + unitId, apiReponse.getMessage());
         Mockito.verify(unitRepository, Mockito.times(1)).deleteById(unitId);
     }
-
-
 
 }
