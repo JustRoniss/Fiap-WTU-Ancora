@@ -1,12 +1,16 @@
 package fiap.wtu_ancora.service;
 
 import fiap.wtu_ancora.dto.UnitDTO;
-import fiap.wtu_ancora.model.Unit;
+import fiap.wtu_ancora.domain.Unit;
+import fiap.wtu_ancora.model.ApiReponse;
 import fiap.wtu_ancora.repository.UnitRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,10 +25,32 @@ public class UnitService {
 
     public Optional<Unit> findUnitById(Long id) {return unitRepository.findById(id);}
 
-    public ResponseEntity<?> getAllUnits() {
-        return ResponseEntity.ok(unitRepository.findAll());
+    public ResponseEntity<ApiReponse<List<Unit>>> getAllUnits() {
+
+        try{
+            List<Unit> units = unitRepository.findAll();
+            ApiReponse<List<Unit>> response = new ApiReponse<>(
+                    "Unidades encontradas",
+                    HttpStatus.OK.value(),
+                    null,
+                    LocalDateTime.now(),
+                    units
+            );
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            ApiReponse<List<Unit>> errorResponse = new ApiReponse<>(
+                    "Erro ao buscar todas as unidades cadastradas",
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null,
+                    LocalDateTime.now(),
+                    null
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
+    // Não é utilizado pela controller, é um metodo auxiliar utilizado no EventService(nao precisa ajustar o retorno para ApiResponse)
     public Set<Unit> findUnitsByIds(Set<Long> unitsId) {
         Set<Unit> unitSet = new HashSet<>();
         for(Long id : unitsId) {
@@ -34,35 +60,81 @@ public class UnitService {
         return unitSet;
     }
 
-   public ResponseEntity<?> createUnit(UnitDTO unitDTO) {
+   public ResponseEntity<ApiReponse<String>> createUnit(UnitDTO unitDTO) {
         try{
             Unit unit = new Unit();
             mapUnitDTOToUnit(unitDTO, unit);
             unitRepository.save(unit);
-            return ResponseEntity.ok("Successfully created a new unit");
+
+            ApiReponse<String> response = new ApiReponse<>(
+                    "Unidade criada com sucesso",
+                    HttpStatus.OK.value(),
+                    null,
+                    LocalDateTime.now(),
+                    null
+            );
+
+            return ResponseEntity.ok(response);
         }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            ApiReponse<String> errorResponse = new ApiReponse<>(
+                    "Erro ao criar unidade",
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null,
+                    LocalDateTime.now(),
+                    e.toString()
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public ResponseEntity<?> updateUnit(Long id, UnitDTO unitDTO) {
+    public ResponseEntity<ApiReponse<String>> updateUnit(Long id, UnitDTO unitDTO) {
         Optional<Unit> unitOptional = unitRepository.findById(id);
         if (unitOptional.isPresent()) {
             Unit unit = unitOptional.get();
             mapUnitDTOToUnit(unitDTO, unit);
             unitRepository.save(unit);
-            return ResponseEntity.ok("Successfully updated a unit");
+
+            ApiReponse<String> response = new ApiReponse<>(
+                    "Unidade atualizada com sucesso",
+                    HttpStatus.OK.value(),
+                    null,
+                    LocalDateTime.now(),
+                    null
+            );
+            return ResponseEntity.ok(response);
         } else{
-            return new ResponseEntity<>("Unit not found",HttpStatus.NOT_FOUND);
+            ApiReponse<String> errorResponse = new ApiReponse<>(
+                    "Unidade não encontrada",
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null,
+                    LocalDateTime.now(),
+                    null
+            );
+            return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
         }
     }
 
-    public ResponseEntity<?> deleteUnit(Long id) {
+    public ResponseEntity<ApiReponse<String>> deleteUnit(Long id) {
         try{
             unitRepository.deleteById(id);
-            return ResponseEntity.ok("Successfully deleted a unit");
+            ApiReponse<String> response = new ApiReponse<>(
+                    "Unidade excluida de Id: " + id + " excluida com sucesso",
+                    HttpStatus.OK.value(),
+                    null,
+                    LocalDateTime.now(),
+                    null
+            );
+
+            return ResponseEntity.ok(response);
         }catch (Exception e){
-            return new ResponseEntity<>("Error to delete this unit", HttpStatus.INTERNAL_SERVER_ERROR);
+            ApiReponse<String> errorResponse = new ApiReponse<>(
+                    "Erro ao excluir unidade de Id: " + id,
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null,
+                    LocalDateTime.now(),
+                    e.toString()
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
