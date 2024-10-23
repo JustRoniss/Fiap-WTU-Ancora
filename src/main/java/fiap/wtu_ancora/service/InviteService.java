@@ -27,6 +27,7 @@ public class InviteService {
            for (Event event : events) {
                Invite invite = new Invite();
 
+               invite.setEventId(event.getId());
                invite.setTitle(event.getTitle());
                invite.setDescription(event.getDescription());
                invite.setIframe(event.getIframe());

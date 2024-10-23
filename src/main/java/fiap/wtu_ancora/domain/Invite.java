@@ -4,6 +4,8 @@ import java.util.Date;
 
 public class Invite {
 
+    private Long eventId;
+
     private String title;
 
     private String description;
@@ -13,6 +15,14 @@ public class Invite {
     private Date startDate;
 
     private Date endDate;
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
 
     public String getTitle() {
         return title;

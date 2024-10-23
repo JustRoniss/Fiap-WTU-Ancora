@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class EventService {
 
+    private final String CLIENT_URI = "http://localhost:3000";
     private final EventRepository eventRepository;
     private final EventHashService eventHashService;
     private final UnitService unitService;
@@ -162,23 +163,52 @@ public class EventService {
         return eventRepository.findEventsByUserEmail(email);
     }
 
-    public ResponseEntity<?> findEventByPublicHash(String publicHash) {
+    public ResponseEntity<ApiReponse<String>> findEventByPublicHash(String publicHash) {
          Optional<Event> event =  eventRepository.findByPublicLink(publicHash);
         if (event.isPresent()) {
-            return ResponseEntity.ok(event.get().getIframe());
+            ApiReponse<String> response = new ApiReponse<>(
+                    "Evento encontrado com sucesso",
+                    HttpStatus.OK.value(),
+                    null,
+                    LocalDateTime.now(),
+                    event.get().getIframe()
+            );
+            return ResponseEntity.ok(response);
         } else {
-            return new ResponseEntity<>("Event not found", HttpStatus.NOT_FOUND);
+            ApiReponse<String> errorResponse = new ApiReponse<>(
+                    "Nenhum evento encontrado para essa public hash",
+                    HttpStatus.NOT_FOUND.value(),
+                    null,
+                    LocalDateTime.now(),
+                    null
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
     }
 
-    public ResponseEntity<?> createPublicLink(Long eventId) {
+    public ResponseEntity<ApiReponse<String>> createPublicLink(Long eventId) {
         Optional<Event> eventOptional = eventRepository.findById(eventId);
         if (eventOptional.isPresent()) {
             Event event = eventOptional.get();
             String link = event.getPublicLink();
-            return ResponseEntity.ok("http:localhost:3000/events/public/"+link);
+            ApiReponse<String> response = new ApiReponse<>(
+                    "Link publico criado",
+                    HttpStatus.OK.value(),
+                    null,
+                    LocalDateTime.now(),
+                    CLIENT_URI + "/events/public/" + link
+            );
+
+            return ResponseEntity.ok(response);
         }else {
-            return new ResponseEntity<>("Event not found", HttpStatus.NOT_FOUND);
+            ApiReponse<String> errorResponse = new ApiReponse<>(
+                    "Erro ao criar link publico",
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    null,
+                    LocalDateTime.now(),
+                    null
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
     }
 

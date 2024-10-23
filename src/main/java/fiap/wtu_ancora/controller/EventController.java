@@ -38,17 +38,17 @@ public class EventController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteEvent(@PathVariable Long id){
+    public ResponseEntity<ApiReponse<Long>> deleteEvent(@PathVariable Long id){
         return eventService.deleteEvent(id);
     }
 
     @GetMapping("/public/{publicHash}")
-    public ResponseEntity<?> getEventByPublicHash(@PathVariable String publicHash) {
+    public ResponseEntity<ApiReponse<String>> getEventByPublicHash(@PathVariable String publicHash) {
          return eventService.findEventByPublicHash(publicHash);
     }
 
     @GetMapping("/public/{eventId}/create-public-link")
-    public ResponseEntity<?> createPublicLink(@PathVariable Long eventId) {
+    public ResponseEntity<ApiReponse<String>> createPublicLink(@PathVariable Long eventId) {
         return eventService.createPublicLink(eventId);
     }
 }
