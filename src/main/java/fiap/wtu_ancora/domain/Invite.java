@@ -1,8 +1,10 @@
-package fiap.wtu_ancora.model;
+package fiap.wtu_ancora.domain;
 
 import java.util.Date;
 
 public class Invite {
+
+    private Long eventId;
 
     private String title;
 
@@ -13,6 +15,14 @@ public class Invite {
     private Date startDate;
 
     private Date endDate;
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
 
     public String getTitle() {
         return title;

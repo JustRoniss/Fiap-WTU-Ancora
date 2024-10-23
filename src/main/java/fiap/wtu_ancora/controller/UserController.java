@@ -1,8 +1,7 @@
 package fiap.wtu_ancora.controller;
 
-import fiap.wtu_ancora.model.User;
+import fiap.wtu_ancora.domain.User;
 import fiap.wtu_ancora.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

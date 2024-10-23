@@ -1,7 +1,7 @@
 package fiap.wtu_ancora.service;
 
 
-import fiap.wtu_ancora.model.User;
+import fiap.wtu_ancora.domain.User;
 import fiap.wtu_ancora.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

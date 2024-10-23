@@ -1,9 +1,9 @@
 package fiap.wtu_ancora.config;
 
 
-import fiap.wtu_ancora.model.Unit;
-import fiap.wtu_ancora.model.User;
-import fiap.wtu_ancora.model.UserRole;
+import fiap.wtu_ancora.domain.Unit;
+import fiap.wtu_ancora.domain.User;
+import fiap.wtu_ancora.domain.UserRole;
 import fiap.wtu_ancora.repository.UnitRepository;
 import fiap.wtu_ancora.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;

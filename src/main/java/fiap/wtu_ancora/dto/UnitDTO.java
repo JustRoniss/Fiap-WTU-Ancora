@@ -1,7 +1,7 @@
 package fiap.wtu_ancora.dto;
 
-import fiap.wtu_ancora.model.Event;
-import fiap.wtu_ancora.model.User;
+import fiap.wtu_ancora.domain.Event;
+import fiap.wtu_ancora.domain.User;
 
 import java.util.Set;
 

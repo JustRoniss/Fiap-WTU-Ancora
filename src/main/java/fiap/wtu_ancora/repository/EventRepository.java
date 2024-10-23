@@ -1,6 +1,6 @@
 package fiap.wtu_ancora.repository;
 
-import fiap.wtu_ancora.model.Event;
+import fiap.wtu_ancora.domain.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
