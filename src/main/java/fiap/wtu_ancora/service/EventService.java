@@ -57,6 +57,10 @@ public class EventService {
                     LocalDateTime.now(),
                     event.getId()
             );
+
+            List<String> usersEmails = eventDTO.getUsers().stream().map(UserDTO::getEmail).toList();
+            EmailSender.sendEmailsToMultipleRecipients(usersEmails);
+
             return ResponseEntity.ok(response);
 
         } catch (Exception e){
