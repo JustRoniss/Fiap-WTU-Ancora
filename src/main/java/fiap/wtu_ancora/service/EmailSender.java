@@ -21,7 +21,7 @@ public class EmailSender {
     private static final String TEMPLATE_ID = "d-4404f136d3ee4554840bbe81779e60eb";
     private static final ExecutorService executorService = Executors.newFixedThreadPool(2);
 
-    public static CompletableFuture<Void> sendInviteEmailAsync(String userEmail) {
+    public static CompletableFuture<Void> sendInviteEmailAsync(String userEmail, String eventTitle) {
         return CompletableFuture.runAsync(() -> {
             Email emailFrom = new Email("fiapjrv@gmail.com");
             Email emailTo = new Email(userEmail);
@@ -31,6 +31,7 @@ public class EmailSender {
             mail.setTemplateId(TEMPLATE_ID);
 
             Personalization personalization = new Personalization();
+            personalization.addDynamicTemplateData("title", eventTitle);
             personalization.addTo(emailTo);
             mail.addPersonalization(personalization);
 
@@ -49,9 +50,9 @@ public class EmailSender {
         }, executorService);
     }
 
-    public static void sendEmailsToMultipleRecipients(Set<String> emailList) {
+    public static void sendEmailsToMultipleRecipients(Set<String> emailList, String eventTitle) {
         emailList.forEach(email -> {
-            sendInviteEmailAsync(email).thenRun(() ->
+            sendInviteEmailAsync(email, eventTitle).thenRun(() ->
                     System.out.println("Envio de e-mail aysnc concluído para: " + email)
             );
         });
