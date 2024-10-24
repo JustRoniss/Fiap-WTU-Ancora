@@ -9,7 +9,7 @@ import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,7 +49,7 @@ public class EmailSender {
         }, executorService);
     }
 
-    public static void sendEmailsToMultipleRecipients(List<String> emailList) {
+    public static void sendEmailsToMultipleRecipients(Set<String> emailList) {
         emailList.forEach(email -> {
             sendInviteEmailAsync(email).thenRun(() ->
                     System.out.println("Envio de e-mail aysnc concluído para: " + email)

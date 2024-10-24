@@ -43,8 +43,6 @@ public class EventService {
 
             mapEventDTOToEvent(eventDTO, event);
 
-            eventRepository.save(event);
-
             Map<String, String> links = new HashMap<>();
             links.put("self", "/events/create");
             links.put("edit",  "/events/edit/" + eventDTO.getId());
@@ -58,7 +56,25 @@ public class EventService {
                     event.getId()
             );
 
-            List<String> usersEmails = eventDTO.getUsers().stream().map(UserDTO::getEmail).toList();
+            boolean hasUnit = eventDTO.getUnits() != null && !eventDTO.getUnits().isEmpty();
+            boolean hasUser = eventDTO.getUsers() != null && !eventDTO.getUsers().isEmpty();
+
+            Set<String> usersEmails = new HashSet<>();
+
+            if (hasUnit) {
+                eventDTO.getUnits().forEach(unit -> {
+                    usersEmails.addAll(userService.findUsersByUnitId(unit.getId()));
+                });
+            }
+
+            if(hasUser) {
+                eventDTO.getUsers().forEach(user -> {
+                    usersEmails.add(user.getEmail());
+                });
+            }
+
+            eventRepository.save(event);
+
             EmailSender.sendEmailsToMultipleRecipients(usersEmails);
 
             return ResponseEntity.ok(response);
@@ -215,6 +231,9 @@ public class EventService {
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
     }
+
+
+//    private ApiReponse<List<Event>>
 
     private Event mapEventDTOToEvent(EventDTO eventDTO, Event event) {
         Set<Long> unitIds = eventDTO.getUnits() != null
