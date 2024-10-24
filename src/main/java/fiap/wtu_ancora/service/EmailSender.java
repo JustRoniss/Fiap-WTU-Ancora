@@ -18,7 +18,7 @@ public class EmailSender {
 
     // O MANEZAO QUE FICA PROCURANDO KEY EM PROJETO DOS OUTROS, ESSE PROJETO É DE ESTUDOS, E ESSA CHAVE É GRATUITA :)
     private static final String SDK = "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";
-    private static final String TEMPLATE_ID = "d-a050c67002c443d9926fa27dda6412ef";
+    private static final String TEMPLATE_ID = "d-4404f136d3ee4554840bbe81779e60eb";
     private static final ExecutorService executorService = Executors.newFixedThreadPool(2);
 
     public static CompletableFuture<Void> sendInviteEmailAsync(String userEmail) {
