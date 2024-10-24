@@ -56,8 +56,7 @@ public class EventController {
     }
 
     @GetMapping("/job/get-events")
-    public ResponseEntity<ApiReponse<EventEmailJobResponse>> getEvents(@RequestParam String start, @RequestParam String end) {
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+    public ResponseEntity<ApiReponse<EventEmailJobResponse>> getEvents(@RequestParam String start, @RequestParam String end) {DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
         LocalDateTime startDate = LocalDateTime.parse(start, formatter);
         LocalDateTime endDate = LocalDateTime.parse(end, formatter);
 

@@ -50,6 +50,10 @@ public class EventService {
             links.put("edit",  "/events/edit/" + eventDTO.getId());
             links.put("delete",  "/events/delete/" + eventDTO.getId());
 
+            //A ordem do save precisa ser antes de montar o response, pois quem cria o id é o hibernate, se tentar montar o reponse antes do id, não funciona.
+            eventRepository.save(event);
+
+
             ApiReponse<Long> response = new ApiReponse<>(
                     "Evento criado com sucesso",
                     HttpStatus.OK.value(),
@@ -75,7 +79,7 @@ public class EventService {
                 });
             }
 
-            eventRepository.save(event);
+
 
             EmailSender.sendEmailsToMultipleRecipients(usersEmails, event.getTitle());
 
