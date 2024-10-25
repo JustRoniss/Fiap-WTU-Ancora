@@ -35,6 +35,7 @@ public class SecurityConfigurations {
                         .requestMatchers("/units/get-all").permitAll()
                         .requestMatchers("/units/**").hasRole("ADMIN")
                         .requestMatchers("/events/public/**").permitAll()
+                        .requestMatchers("/events/job/get-events/**").permitAll()
                         .requestMatchers("/events/**").hasRole("ADMIN")
                         .requestMatchers("/home/**").hasRole("USER")
                         .anyRequest().authenticated()

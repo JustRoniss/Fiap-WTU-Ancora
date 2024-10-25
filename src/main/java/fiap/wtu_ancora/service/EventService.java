@@ -7,6 +7,8 @@ import fiap.wtu_ancora.domain.Event;
 import fiap.wtu_ancora.domain.Unit;
 import fiap.wtu_ancora.domain.User;
 import fiap.wtu_ancora.model.ApiReponse;
+import fiap.wtu_ancora.model.EventDetailToEmailJob;
+import fiap.wtu_ancora.model.EventEmailJobResponse;
 import fiap.wtu_ancora.repository.EventRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,12 +45,14 @@ public class EventService {
 
             mapEventDTOToEvent(eventDTO, event);
 
-            eventRepository.save(event);
-
             Map<String, String> links = new HashMap<>();
             links.put("self", "/events/create");
             links.put("edit",  "/events/edit/" + eventDTO.getId());
             links.put("delete",  "/events/delete/" + eventDTO.getId());
+
+            //A ordem do save precisa ser antes de montar o response, pois quem cria o id é o hibernate, se tentar montar o reponse antes do id, não funciona.
+            eventRepository.save(event);
+
 
             ApiReponse<Long> response = new ApiReponse<>(
                     "Evento criado com sucesso",
@@ -57,6 +61,28 @@ public class EventService {
                     LocalDateTime.now(),
                     event.getId()
             );
+
+            boolean hasUnit = eventDTO.getUnits() != null && !eventDTO.getUnits().isEmpty();
+            boolean hasUser = eventDTO.getUsers() != null && !eventDTO.getUsers().isEmpty();
+
+            Set<String> usersEmails = new HashSet<>();
+
+            if (hasUnit) {
+                eventDTO.getUnits().forEach(unit -> {
+                    usersEmails.addAll(userService.findUsersByUnitId(unit.getId()));
+                });
+            }
+
+            if(hasUser) {
+                eventDTO.getUsers().forEach(user -> {
+                    usersEmails.add(user.getEmail());
+                });
+            }
+
+
+
+            EmailSender.sendEmailsToMultipleRecipients(usersEmails, event.getTitle());
+
             return ResponseEntity.ok(response);
 
         } catch (Exception e){
@@ -186,6 +212,55 @@ public class EventService {
         }
     }
 
+    public ResponseEntity<ApiReponse<EventEmailJobResponse>> getEventsBeetweenTimes(LocalDateTime startDate, LocalDateTime endDate) {
+        try{
+            List<Event> eventsMatch = eventRepository.findEventsStartingWithinOneHour(startDate, endDate);
+
+            if (!eventsMatch.isEmpty()) {
+
+                EventEmailJobResponse eventEmailJobResponse = new EventEmailJobResponse();
+
+               eventsMatch.forEach(event -> {
+                   EventDetailToEmailJob emailJob = new EventDetailToEmailJob();
+                   emailJob.setTitle(event.getTitle());
+                   emailJob.setStartDate(event.getStartDate());
+                   emailJob.setUsersEmails(findUsersEmailsFromEvent(event));
+
+                   eventEmailJobResponse.setEventDetailToEmailJobMap(event.getId(), emailJob);
+               });
+
+                ApiReponse<EventEmailJobResponse> response = new ApiReponse<>(
+                        "Eventos encontrados",
+                        HttpStatus.OK.value(),
+                        null,
+                        LocalDateTime.now(),
+                        eventEmailJobResponse
+                );
+
+                return ResponseEntity.ok(response);
+            }else {
+                ApiReponse<EventEmailJobResponse> notFoundResponse = new ApiReponse<>(
+                        "Nenhum evento encontrado",
+                        HttpStatus.OK.value(),
+                        null,
+                        LocalDateTime.now(),
+                        null
+                );
+                return new ResponseEntity<>(notFoundResponse, HttpStatus.NOT_FOUND);
+            }
+
+        }catch (Exception e){
+            ApiReponse<EventEmailJobResponse> errorResponse = new ApiReponse<>(
+                    e.getMessage(),
+                    HttpStatus.OK.value(),
+                    null,
+                    LocalDateTime.now(),
+                    null
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public ResponseEntity<ApiReponse<String>> createPublicLink(Long eventId) {
         Optional<Event> eventOptional = eventRepository.findById(eventId);
         if (eventOptional.isPresent()) {
@@ -210,6 +285,27 @@ public class EventService {
             );
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
+    }
+
+    private Set<String> findUsersEmailsFromEvent(Event event){
+        boolean hasUnit = event.getUnits() != null && !event.getUnits().isEmpty();
+        boolean hasUser = event.getUsers() != null && !event.getUsers().isEmpty();
+
+        Set<String> usersEmails = new HashSet<>();
+
+        if (hasUnit) {
+            event.getUnits().forEach(unit -> {
+                usersEmails.addAll(userService.findUsersByUnitId(unit.getId()));
+            });
+        }
+
+        if(hasUser) {
+            event.getUsers().forEach(user -> {
+                usersEmails.add(user.getEmail());
+            });
+        }
+
+        return usersEmails;
     }
 
     private Event mapEventDTOToEvent(EventDTO eventDTO, Event event) {

@@ -3,10 +3,13 @@ package fiap.wtu_ancora.controller;
 import fiap.wtu_ancora.domain.Event;
 import fiap.wtu_ancora.dto.EventDTO;
 import fiap.wtu_ancora.model.ApiReponse;
+import fiap.wtu_ancora.model.EventEmailJobResponse;
 import fiap.wtu_ancora.service.EventService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -50,5 +53,13 @@ public class EventController {
     @GetMapping("/public/{eventId}/create-public-link")
     public ResponseEntity<ApiReponse<String>> createPublicLink(@PathVariable Long eventId) {
         return eventService.createPublicLink(eventId);
+    }
+
+    @GetMapping("/job/get-events")
+    public ResponseEntity<ApiReponse<EventEmailJobResponse>> getEvents(@RequestParam String start, @RequestParam String end) {DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+        LocalDateTime startDate = LocalDateTime.parse(start, formatter);
+        LocalDateTime endDate = LocalDateTime.parse(end, formatter);
+
+        return eventService.getEventsBeetweenTimes(startDate, endDate);
     }
 }
