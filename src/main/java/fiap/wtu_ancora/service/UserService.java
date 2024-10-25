@@ -1,6 +1,5 @@
 package fiap.wtu_ancora.service;
 
-
 import fiap.wtu_ancora.domain.User;
 import fiap.wtu_ancora.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -39,5 +39,12 @@ public class UserService {
             }
         }
         return users;
+    }
+
+    public Set<String> findUsersByUnitId(Long unitId){
+        List<User> users = userRepository.findByUnitId(unitId);
+        return users.stream()
+                .map(User::getEmail)
+                .collect(Collectors.toSet());
     }
 }
